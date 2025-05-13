@@ -1,5 +1,5 @@
 import { useState } from "react";
-// import axios from "axios";
+import axios from "axios";
 import "./App.css";
 import BTSdataTable from "./components/BTSdataTable.jsx";
 import GPSdataTable from "./components/GPSdataTable.jsx";
@@ -79,21 +79,36 @@ function App() {
     };
     reader.readAsText(file);
   };
-
-  // const handleSendData = () => {
-  //   if (!btsData) {
-  //     console.error("Data nejsou připravena k odeslání.");
-  //     return;
-  //   }
-  //   axios
-  //     .post("http://localhost:3001/api/btsdata", btsData)
-  //     .then((response) => {
-  //       console.log("Data úspěšně odeslána:", response.data);
-  //     })
-  //     .catch((error) => {
-  //       console.error("Chyba při odesílání dat:", error);
-  //     });
-  // };
+  // funkce na poslani BTS dat backendu
+  const sendBTSData = () => {
+    if (!btsData || btsData === 0) {
+      console.error("Neco spatne s BTS daty");
+      return;
+    }
+    axios
+      .post("http://localhost/phone-tracker/btsdata", { data: btsData })
+      .then((response) => {
+        console.log("Data spesne odeslana:", response.data);
+      })
+      .catch((error) => {
+        console.error("Chyba pri odesilani dat:", error);
+      });
+  };
+  // funkce na poslani GPS dat backendu
+  const sendGPSData = () => {
+    if (!gpsData || gpsData === 0) {
+      console.error("Neco spatne s GPS daty");
+      return;
+    }
+    axios
+      .post("http://localhost/phone-tracker/btsdata", { data: gpsData })
+      .then((response) => {
+        console.log("Data spesne odeslana:", response.data);
+      })
+      .catch((error) => {
+        console.error("Chyba pri odesilani dat:", error);
+      });
+  };
   return (
     <>
       <div className="container">
@@ -105,7 +120,7 @@ function App() {
             <p>Upload BTS data in CSV format</p>
             <div>
               <label htmlFor="btsFile" className="btn btn-primary">
-                BTS data{" "}
+                upload BTS data here...{" "}
               </label>
               <input
                 type="file"
@@ -117,24 +132,24 @@ function App() {
             </div>
           </div>
           <div className="BTSdataHandle">
-            <button className="btn btn-success">Save</button>
+            <button className="btn btn-success" onClick={sendBTSData}>
+              Save
+            </button>
             <button className="btn btn-warning">Load</button>
           </div>
-
           <div className="BTSdata">{<BTSdataTable btsData={btsData} />}</div>
-
           <div className="sourceSwitch">
             <button
               className="btn btn-success"
               onClick={() => setActiveSource("bts")}
             >
-              Zobrazit BTS
+              Show BTS towers data
             </button>
             <button
               className="btn btn-success"
               onClick={() => setActiveSource("gps")}
             >
-              Zobrazit GPS
+              Show GPS track polyline
             </button>
           </div>
           <div className="MapShow">
@@ -147,7 +162,7 @@ function App() {
             <p>Upload GPS data inGPX format</p>
             <div>
               <label htmlFor="gpsFile" className="btn btn-primary">
-                GPS data{" "}
+                upload GPS data here...{" "}
               </label>
               <input
                 type="file"
@@ -159,7 +174,9 @@ function App() {
             </div>
           </div>
           <div className="GPSdataHandle">
-            <button className="btn btn-success">Save</button>
+            <button className="btn btn-success" onClick={sendGPSData}>
+              Save
+            </button>
             <button className="btn btn-warning">Load</button>
           </div>
           <div className="GPSdata">{<GPSdataTable gpsData={gpsData} />}</div>

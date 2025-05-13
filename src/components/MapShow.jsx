@@ -9,12 +9,13 @@ import MapSetter from "./MapSetter";
 
 function MapShow({ data, sourceType }) {
   console.log("Data:", data);
-  console.log("sourceType", sourceType);
+  // console.log("sourceType", sourceType);
+
   //vychozi stred a zoom
   const defaultCenter = [50.0755, 14.4378]; // Praha
   const defaultZoom = 8;
 
-  // první zaznam s GPS souradnicemi z BTS dat
+  // validace dat a prirazeni souradnic dle
   const validData =
     sourceType === "gps"
       ? data.filter(
@@ -31,9 +32,6 @@ function MapShow({ data, sourceType }) {
             !isNaN(parseFloat(item.lat)) &&
             !isNaN(parseFloat(item.long))
         );
-  //kontrola vstupnich dat
-
-  // console.log("Calculated Center:", center);
 
   // Střed mapy se nastaví podle prvního validního bodu, nebo na výchozí hodnoty
   const center =
