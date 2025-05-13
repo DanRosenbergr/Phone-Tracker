@@ -20,7 +20,7 @@ function BTSdataTable({ btsData }) {
       <table className="table">
         <thead>
           <tr>
-            <th>Date / Time</th>
+            <th>Date/Time</th>
             <th>Tower Id</th>
             <th>rssi</th>
             <th>Technologie</th>

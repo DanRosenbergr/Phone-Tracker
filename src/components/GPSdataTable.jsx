@@ -22,7 +22,7 @@ function GPSdataTable({ gpsData }) {
             <th>Latitude</th>
             <th>Longitude</th>
             <th>Altitude</th>
-            <th>Time</th>
+            <th>Date/Time</th>
           </tr>
         </thead>
         <tbody>

@@ -10,6 +10,10 @@ function App() {
   const [btsData, setBtsData] = useState([]);
   const [gpsData, setGpsData] = useState([]);
   const [activeSource, setActiveSource] = useState("bts"); // nebo 'gps'
+  const [savedRecordsBTS, setSavedRecordsBTS] = useState([]); // seznam uložených záznamů
+  const [savedRecordsGPS, setSavedRecordsGPS] = useState([]); // seznam uložených záznamů
+  const [showListBTS, setShowListBTS] = useState(false);
+  const [showListGPS, setShowListGPS] = useState(false);
 
   // zpracovani CSV souboru a ziskani BTS dat
   const handleFileUploadBTS = (e) => {
@@ -44,7 +48,6 @@ function App() {
     };
     reader.readAsText(file);
   };
-
   // zpracovani GPX souboru a ziskani GPS dat
   const handleFileUploadGPS = (e) => {
     const file = e.target.files[0];
@@ -79,9 +82,10 @@ function App() {
     };
     reader.readAsText(file);
   };
+
   // funkce na poslani BTS dat backendu
   const sendBTSData = () => {
-    if (!btsData || btsData === 0) {
+    if (!btsData.lenght) {
       console.error("Neco spatne s BTS daty");
       return;
     }
@@ -96,12 +100,12 @@ function App() {
   };
   // funkce na poslani GPS dat backendu
   const sendGPSData = () => {
-    if (!gpsData || gpsData === 0) {
+    if (!gpsData.lenght) {
       console.error("Neco spatne s GPS daty");
       return;
     }
     axios
-      .post("http://localhost/phone-tracker/btsdata", { data: gpsData })
+      .post("http://localhost/phone-tracker/gpsdata", { data: gpsData })
       .then((response) => {
         console.log("Data spesne odeslana:", response.data);
       })
@@ -109,6 +113,58 @@ function App() {
         console.error("Chyba pri odesilani dat:", error);
       });
   };
+
+  // Nacteni zaznamu BTS z backendu
+  const loadBtsRecords = () => {
+    axios
+      .get("http://localhost/phone-tracker/records?source=bts")
+      .then((response) => {
+        setSavedRecordsBTS(response.data);
+        setShowListBTS(true);
+      })
+      .catch((error) => {
+        console.error("chyba pri vsech zaznamu GPS:", error);
+      });
+  };
+  //Nacteni zaznamu GPS z backendu
+  const loadGpsRecords = () => {
+    axios
+      .get("http://localhost/phone-tracker/records?source=gps")
+      .then((response) => {
+        setSavedRecordsGPS(response.data);
+        setShowListGPS(true);
+      })
+      .catch((error) => {
+        console.error("chyba pri vsech zaznamu GPS:", error);
+      });
+  };
+
+  // Nacteni konretniho zaznamu BTS
+  const loadBtsData = (recordIdBTS) => {
+    axios
+      .get(`http://localhost/phone-tracker/recordsBTS/${recordIdBTS}`)
+      .then((response) => {
+        setBtsData(response.data);
+        setShowListBTS(false);
+      })
+      .catch((error) => {
+        console.error("chyba pri nacitani zaznamu BTS:", error);
+      });
+  };
+
+  // Nacteni konretniho zaznamu GPS
+  const loadGpsData = (recordIdGPS) => {
+    axios
+      .get(`http://localhost/phone-tracker/recordsGPS/${recordIdGPS}`)
+      .then((response) => {
+        setGpsData(response.data);
+        setShowListGPS(false);
+      })
+      .catch((error) => {
+        console.error("chyba pri nacitani zaznamu GPS", error);
+      });
+  };
+
   return (
     <>
       <div className="container">
@@ -135,18 +191,41 @@ function App() {
             <button className="btn btn-success" onClick={sendBTSData}>
               Save
             </button>
-            <button className="btn btn-warning">Load</button>
+            <button className="btn btn-warning" onClick={loadBtsRecords}>
+              Load
+            </button>
           </div>
-          <div className="BTSdata">{<BTSdataTable btsData={btsData} />}</div>
+          <div className="BTSwindow">
+            {showListBTS ? (
+              <div className="BTSRecords">
+                <p>Saved BTS Records</p>
+                <ul>
+                  {savedRecordsBTS.map((record) => (
+                    <li
+                      key={record.id}
+                      onClick={() => loadBtsData(record.id)}
+                      className="BTSrecordItem"
+                    >
+                      {record.name} - {record.date}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="BTSdata">
+                {<BTSdataTable btsData={btsData} />}
+              </div>
+            )}
+          </div>
           <div className="sourceSwitch">
             <button
-              className="btn btn-success"
+              className="btn btn-success btnSwitch"
               onClick={() => setActiveSource("bts")}
             >
               Show BTS towers data
             </button>
             <button
-              className="btn btn-success"
+              className="btn btn-success btnSwitch"
               onClick={() => setActiveSource("gps")}
             >
               Show GPS track polyline
@@ -177,9 +256,32 @@ function App() {
             <button className="btn btn-success" onClick={sendGPSData}>
               Save
             </button>
-            <button className="btn btn-warning">Load</button>
+            <button className="btn btn-warning" onClick={loadGpsRecords}>
+              Load
+            </button>
           </div>
-          <div className="GPSdata">{<GPSdataTable gpsData={gpsData} />}</div>
+          <div className="GPSwindow">
+            {showListGPS ? (
+              <div className="GPSRecords">
+                <p>Saved GPS Records</p>
+                <ul>
+                  {savedRecordsGPS.map((record) => (
+                    <li
+                      key={record.id}
+                      onClick={() => loadGpsData(record.id)}
+                      className="GPSrecordItem"
+                    >
+                      {record.name} - {record.date}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <div className="GPSdata">
+                {<GPSdataTable gpsData={gpsData} />}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </>
