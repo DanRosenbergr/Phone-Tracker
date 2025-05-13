@@ -85,14 +85,18 @@ function App() {
 
   // funkce na poslani BTS dat backendu
   const sendBTSData = () => {
-    if (!btsData.lenght) {
+    if (!btsData.length) {
       console.error("Neco spatne s BTS daty");
       return;
     }
+    const nameBts = prompt("Zadejte nazev zaznamu:");
     axios
-      .post("http://localhost/phone-tracker/btsdata", { data: btsData })
+      .post("http://localhost/phone-tracker/btsdata", {
+        data: btsData,
+        nameBts,
+      })
       .then((response) => {
-        console.log("Data spesne odeslana:", response.data);
+        console.log("Data uspesne odeslana:", response.data);
       })
       .catch((error) => {
         console.error("Chyba pri odesilani dat:", error);
@@ -100,12 +104,16 @@ function App() {
   };
   // funkce na poslani GPS dat backendu
   const sendGPSData = () => {
-    if (!gpsData.lenght) {
+    if (!gpsData.length) {
       console.error("Neco spatne s GPS daty");
       return;
     }
+    const nameGps = prompt("Zadejte nazev zaznamu:");
     axios
-      .post("http://localhost/phone-tracker/gpsdata", { data: gpsData })
+      .post("http://localhost/phone-tracker/gpsdata", {
+        data: gpsData,
+        nameGps,
+      })
       .then((response) => {
         console.log("Data spesne odeslana:", response.data);
       })
@@ -168,9 +176,6 @@ function App() {
   return (
     <>
       <div className="container">
-        {/*Header*/}
-        {/* <div className="sourceData d-flex justify-content-center align-items-center text-center"></div> */}
-        {/*main window */}
         <div className="mainWindow">
           <div className="BTSupload ">
             <p>Upload BTS data in CSV format</p>

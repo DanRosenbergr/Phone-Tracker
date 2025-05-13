@@ -8,7 +8,7 @@ import {
 import MapSetter from "./MapSetter";
 
 function MapShow({ data, sourceType }) {
-  console.log("Data:", data);
+  // console.log("Data:", data);
   // console.log("sourceType", sourceType);
 
   //vychozi stred a zoom
