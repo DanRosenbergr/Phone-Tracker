@@ -5,7 +5,20 @@ import {
   Popup,
   Polyline,
 } from "react-leaflet";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
+import markerIconPng from "leaflet/dist/images/marker-icon.png";
+import markerShadowPng from "leaflet/dist/images/marker-shadow.png";
 import MapSetter from "./MapSetter";
+
+const customIcon = new L.Icon({
+  iconUrl: markerIconPng,
+  shadowUrl: markerShadowPng,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
 
 function MapShow({ data, sourceType }) {
   // console.log("Data:", data);
@@ -13,9 +26,10 @@ function MapShow({ data, sourceType }) {
 
   //vychozi stred a zoom
   const defaultCenter = [50.0755, 14.4378]; // Praha
-  const defaultZoom = 8;
+  const defaultZoom = 12;
 
-  // validace dat a prirazeni souradnic dle
+  // prirazeni souradnic dle zdroje, BTS pouze pro vycentrovani mapy
+  // GPS data pouzivaji dlouhy zapis
   const validData =
     sourceType === "gps"
       ? data.filter(
@@ -33,7 +47,7 @@ function MapShow({ data, sourceType }) {
             !isNaN(parseFloat(item.long))
         );
 
-  // Střed mapy se nastaví podle prvního validního bodu, nebo na výchozí hodnoty
+  // Nastaveni stredu mapy na zaklade zdroje
   const center =
     validData.length > 0
       ? [
@@ -46,10 +60,10 @@ function MapShow({ data, sourceType }) {
         ]
       : defaultCenter;
 
-  // Připravíme pole souřadnic pro vykreslení čáry !!!!!! ted to bere data z BTS, ne GPS!!!!
+  // souradnice GPS dat pro vykresleni
   const polylineCoordinates = validData.map((item) => [
-    parseFloat(sourceType === "gps" ? item.latitude : item.lat),
-    parseFloat(sourceType === "gps" ? item.longitude : item.long),
+    parseFloat(item.latitude),
+    parseFloat(item.longitude),
   ]);
 
   return (
@@ -73,7 +87,7 @@ function MapShow({ data, sourceType }) {
           const lat = parseFloat(item.lat);
           const lng = parseFloat(item.long);
           return (
-            <Marker key={index} position={[lat, lng]}>
+            <Marker key={index} position={[lat, lng]} icon={customIcon}>
               <Popup>
                 <strong>BTS {item.cid}</strong>
                 <br />
